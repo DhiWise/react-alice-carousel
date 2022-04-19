@@ -182,6 +182,7 @@ export enum Classnames {
 	BUTTON_NEXT_ITEM = 'alice-carousel__next-btn-item',
 }
 
+
 export enum Modifiers {
 	ACTIVE = '__active',
 	INACTIVE = '__inactive',
