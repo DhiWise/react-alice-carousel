@@ -37,6 +37,7 @@ export default class AliceCarousel extends React.PureComponent<Props, State> {
 	constructor(props) {
 		super(props);
 
+		// gets initial data
 		this.state = Utils.calculateInitialState(props, null);
 
 		this.isHovered = false;
@@ -174,7 +175,11 @@ export default class AliceCarousel extends React.PureComponent<Props, State> {
 			this.hasUserAction = true;
 		}
 
-		const activeIndex = this.state.activeIndex - 1;
+		// const activeIndex = this.state.activeIndex - 1;
+		const slidesToShow = this.state.itemsInSlide;
+		const activeIndex = this.state.activeIndex - slidesToShow >= 0 
+			? this.state.activeIndex - slidesToShow 
+			: (this.state.itemsCount-1) - (slidesToShow - this.state.activeIndex);
 
 		if (this.isFadeoutAnimationAllowed) {
 			const fadeoutAnimationPosition = -this.state.stageWidth;
@@ -191,7 +196,11 @@ export default class AliceCarousel extends React.PureComponent<Props, State> {
 			this.hasUserAction = true;
 		}
 
-		const activeIndex = this.state.activeIndex + 1;
+		// const activeIndex = this.state.activeIndex + 1;
+		const slidesToShow = this.state.itemsInSlide;
+		const activeIndex = this.state.activeIndex + slidesToShow > this.state.itemsCount
+			? (this.state.activeIndex + slidesToShow) - (this.state.itemsCount - 1)
+			: this.state.activeIndex + slidesToShow;
 
 		if (this.isFadeoutAnimationAllowed) {
 			const fadeoutAnimationPosition = this.state.stageWidth;
@@ -547,7 +556,20 @@ export default class AliceCarousel extends React.PureComponent<Props, State> {
 
 		this.autoPlayTimeoutId = setTimeout(() => {
 			if (!this.isHovered) {
-				autoPlayDirection === AutoplayDirection.RTL ? this.slidePrev({}) : this.slideNext({});
+				const slidesToShow  = this.state.itemsInSlide;
+				if (autoPlayDirection === AutoplayDirection.RTL) {
+					const newSlideIndex = this.state.activeIndex - slidesToShow >= 0 
+						? this.state.activeIndex - slidesToShow 
+						: (this.state.itemsCount-1) - (slidesToShow - this.state.activeIndex);
+					this.slideTo(newSlideIndex);
+				}	else {
+					const newSlideIndex = this.state.activeIndex + slidesToShow > this.state.itemsCount
+						? (this.state.activeIndex + slidesToShow) - (this.state.itemsCount - 1)
+						: this.state.activeIndex + slidesToShow;
+					this.slideTo(newSlideIndex);
+				}
+				// autoPlayDirection === AutoplayDirection.RTL ? this.slidePrev({}) : this.slideNext({});
+				// autoPlayDirection === AutoplayDirection.RTL ? this.slidePrev({}) : this.slideNext({});
 			}
 		}, autoPlayInterval);
 	}
@@ -592,7 +614,7 @@ export default class AliceCarousel extends React.PureComponent<Props, State> {
 
 	_renderStageItem = (item, i: number) => {
 		const styles = Utils.getRenderStageItemStyles(i, this.state);
-		const className = Utils.getRenderStageItemClasses(i, this.state);
+		const className = Utils.getRenderStageItemClasses(i, this.state, this.props);
 		return <Views.StageItem styles={styles} className={className} key={`stage-item-${i}`} item={item} />;
 	};
 

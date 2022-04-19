@@ -41,6 +41,8 @@ export interface Props {
 	renderPrevButton?: ({ isDisabled }) => any;
 	renderNextButton?: ({ isDisabled }) => any;
 	renderPlayPauseButton?: ({ isPlaying }) => any;
+	magnifiedIndex?: number;
+	scaleCss?: string;
 }
 
 export interface State {
@@ -189,4 +191,5 @@ export enum Modifiers {
 	SEPARATOR = '__separator',
 	SSR = '__ssr',
 	TARGET = '__target',
+	CENTERED = '__centered'
 }

@@ -1,14 +1,32 @@
+/* eslint-disable no-console */
 import * as Utils from '.';
-import { State, Classnames, Modifiers } from '../types';
+import { State, Classnames, Modifiers, Props } from '../types';
 
-export const getRenderStageItemClasses = (i = 0, state: State) => {
+export const getRenderStageItemClasses = (i = 0, state: State, props: Props) => {
 	const { fadeoutAnimationIndex } = state;
 	const isActive = isActiveItem(i, state) ? Modifiers.ACTIVE : '';
 	const isCloned = isClonedItem(i, state) ? Modifiers.CLONED : '';
 	const isTarget = isTargetItem(i, state) ? Modifiers.TARGET : '';
 	const isAnimated = i === fadeoutAnimationIndex ? Classnames.ANIMATED : '';
+	const notCentered = isActive && notCenteredItem(i, state, props) ? `${Modifiers.CENTERED} ${props.scaleCss}` : '';
 
-	return Utils.concatClassnames(Classnames.STAGE_ITEM, isActive, isCloned, isTarget, isAnimated);
+	return Utils.concatClassnames(Classnames.STAGE_ITEM, isActive, isCloned, isTarget, isAnimated, notCentered);
+};
+
+export const notCenteredItem = (i = 0, state: State, props: Props) => {
+	const { itemsInSlide, itemsOffset } = state;
+	const shiftIndex = Utils.getShiftIndex(itemsInSlide, itemsOffset);
+	const actualIndex = i - shiftIndex;
+	if (props?.magnifiedIndex !== undefined) {
+		if ((state?.activeIndex + props.magnifiedIndex) >= state.itemsCount) {
+			// console.log('greater: ', (state.activeIndex + props.magnifiedIndex - (state.itemsCount)), shiftIndex);
+			return actualIndex !== (state.activeIndex + props.magnifiedIndex - (state.itemsCount));
+		} else {
+			// console.log('limits: ', state.activeIndex + props.magnifiedIndex, shiftIndex);
+			return  actualIndex !== state.activeIndex + props.magnifiedIndex;
+		}
+	} 
+	return false;
 };
 
 export const isActiveItem = (i = 0, state: State) => {
